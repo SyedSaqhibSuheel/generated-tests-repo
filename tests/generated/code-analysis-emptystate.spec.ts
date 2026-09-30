@@ -9,27 +9,16 @@ test.describe('Code Analysis: EmptyState', () => {
     await page.waitForURL('http://localhost:5173/');
   });
 
-  test('Handle Invalid or Missing Type Prop', async ({ page }) => {
+  test('Render No Selection State', async ({ page }) => {
     await page.goto('http://localhost:5173/');
-    await page.getByTestId('input-customer-search').fill('INVALIDSTATE');
-    
-    // The component defaults to rendering the fallback/no-results view gracefully
     await expect(page.getByTestId('text-search-title')).toBeVisible();
+    await expect(page.getByTestId('text-search-title')).toHaveText('No Customer Selected');
   });
 
-  test('Render Empty State for No Selection', async ({ page }) => {
+  test('Render No Results State', async ({ page }) => {
     await page.goto('http://localhost:5173/');
-    await page.getByTestId('tab-verification').click();
-
-    // Verify the 'no-selection' empty state heading and guidance text
+    await page.getByTestId('input-customer-search').fill('NONEXISTENT_CUSTOMER_99999');
     await expect(page.getByTestId('text-search-title')).toBeVisible();
-  });
-
-  test('Render Empty State for No Results', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    await page.getByTestId('input-customer-search').fill('NONEXISTENTCUSTOMER999');
-
-    // Verify the 'no-results' empty state is displayed
-    await expect(page.getByTestId('text-search-title')).toBeVisible();
+    await expect(page.getByTestId('text-search-title')).toHaveText('No Results Found');
   });
 });
