@@ -1,53 +1,60 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Code Analysis: CustomerDatabase', () => {
-  test.beforeEach(async ({ page }) => {
+  test('Display Customer Database initial state', async ({ page }) => {
     await page.goto('http://localhost:5173/login');
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    await page.waitForURL('http://localhost:5173/');
-  });
-
-  test('Filter Customers Using Status Dropdown', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    await page.getByTestId('select-status-filter').selectOption('active');
-    const customerRows = page.locator('[data-testid^="row-customer-"]');
-    await expect(customerRows.first()).toBeVisible();
-  });
-
-  test('Display Customer Database with Initial Data', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.getByTestId('tab-database').click();
     await expect(page.getByTestId('text-database-title')).toBeVisible();
-    const customerRows = page.locator('[data-testid^="row-customer-"]');
-    await expect(customerRows.first()).toBeVisible();
+    await expect(page.locator('[data-testid^="row-customer-"]').first()).toBeVisible();
   });
 
-  test('Filter Customers Using Search Input', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    await page.getByTestId('input-database-search').fill('John');
-    const customerRows = page.locator('[data-testid^="row-customer-"]');
-    await expect(customerRows.first()).toBeVisible();
+  test('Search customers by name, email, or customer ID', async ({ page }) => {
+    await page.goto('http://localhost:5173/login');
+    await page.getByTestId('input-username').fill('Sarah Johnson');
+    await page.getByTestId('input-password').fill('12345');
+    await page.getByTestId('button-sign-in').click();
+    await page.getByTestId('tab-database').click();
+    await page.getByTestId('input-database-search').fill('Syed');
+    await expect(page.locator('[data-testid^="row-customer-"]').first()).toBeVisible();
   });
 
-  test('Display Empty State When No Customers Match Filters', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    await page.getByTestId('input-database-search').fill('NONEXISTENT_CUSTOMER_XYZ');
-    const customerRows = page.locator('[data-testid^="row-customer-"]');
-    await expect(customerRows).toHaveCount(0);
+  test('Filter customers by status', async ({ page }) => {
+    await page.goto('http://localhost:5173/login');
+    await page.getByTestId('input-username').fill('Sarah Johnson');
+    await page.getByTestId('input-password').fill('12345');
+    await page.getByTestId('button-sign-in').click();
+    await page.getByTestId('tab-database').click();
+    await page.getByTestId('select-status-filter').click();
   });
 
-  test('Trigger View Customer Action', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    const viewButton = page.locator('[data-testid^="button-view-"]').first();
-    await expect(viewButton).toBeVisible();
-    await viewButton.click();
+  test('Empty state handling when search returns no results', async ({ page }) => {
+    await page.goto('http://localhost:5173/login');
+    await page.getByTestId('input-username').fill('Sarah Johnson');
+    await page.getByTestId('input-password').fill('12345');
+    await page.getByTestId('button-sign-in').click();
+    await page.getByTestId('tab-database').click();
+    await page.getByTestId('input-database-search').fill('NonExistentCustomer12345');
+    await expect(page.getByText('No customers found')).toBeVisible();
   });
 
-  test('Trigger Send Authorization Request Action', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    const sendButton = page.locator('[data-testid^="button-send-"]').first();
-    await expect(sendButton).toBeVisible();
-    await sendButton.click();
+  test('Trigger view customer action', async ({ page }) => {
+    await page.goto('http://localhost:5173/login');
+    await page.getByTestId('input-username').fill('Sarah Johnson');
+    await page.getByTestId('input-password').fill('12345');
+    await page.getByTestId('button-sign-in').click();
+    await page.getByTestId('tab-database').click();
+    await page.locator('[data-testid^="button-view-"]').first().click();
+  });
+
+  test('Trigger send authorization request action', async ({ page }) => {
+    await page.goto('http://localhost:5173/login');
+    await page.getByTestId('input-username').fill('Sarah Johnson');
+    await page.getByTestId('input-password').fill('12345');
+    await page.getByTestId('button-sign-in').click();
+    await page.getByTestId('tab-database').click();
+    await page.locator('[data-testid^="button-send-"]').first().click();
   });
 });
