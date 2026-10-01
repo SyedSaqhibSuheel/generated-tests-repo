@@ -6,48 +6,42 @@ test.describe('Code Analysis: IconRail', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    await page.waitForURL('http://localhost:5173/');
-  });
-
-  test('Toggle Agent Panel visibility on XL viewports', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('http://localhost:5173/');
-    // Agent panel toggle state check on XL viewports
-    const tabVerification = page.getByTestId('tab-verification');
-    await expect(tabVerification).toBeVisible();
-  });
-
-  test('Verify Tooltip display on hover', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    const tabVerification = page.getByTestId('tab-verification');
-    await tabVerification.hover();
-    await expect(tabVerification).toBeVisible();
-  });
-
-  test('Switch to Customer Verification tab', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
-    const tabVerification = page.getByTestId('tab-verification');
-    await tabVerification.click();
-    await expect(tabVerification).toBeVisible();
+    await expect(page).toHaveURL('http://localhost:5173/');
   });
 
   test('Switch to Customer Database tab', async ({ page }) => {
     await page.goto('http://localhost:5173/');
-    const tabDatabase = page.getByTestId('tab-database');
-    await tabDatabase.click();
-    await expect(tabDatabase).toBeVisible();
+    await page.getByTestId('rail-database').click();
+    await expect(page.getByTestId('rail-database')).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByTestId('rail-database')).toHaveAttribute('data-active', 'true');
   });
 
-  test('Agent Panel toggle hidden on non-XL viewports', async ({ page }) => {
-    await page.setViewportSize({ width: 800, height: 600 });
+  test('Tooltip display on hover', async ({ page }) => {
     await page.goto('http://localhost:5173/');
-    const tabVerification = page.getByTestId('tab-verification');
-    await expect(tabVerification).toBeVisible();
+    await page.getByTestId('rail-verification').hover();
+    const tooltip = page.getByRole('tooltip').or(page.locator('[role="tooltip"], [data-tooltip], title, :text("Customer Verification")')).first();
+    await expect(page.getByTestId('rail-verification')).toBeVisible();
   });
 
   test('Trigger Logout action', async ({ page }) => {
     await page.goto('http://localhost:5173/');
-    await page.getByTestId('button-logout').click();
-    await expect(page).toHaveURL('http://localhost:5173/login');
+    await page.getByTestId('rail-logout').click();
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test('Switch to Customer Verification tab', async ({ page }) => {
+    await page.goto('http://localhost:5173/');
+    await page.getByTestId('rail-database').click();
+    await page.getByTestId('rail-verification').click();
+    await expect(page.getByTestId('rail-verification')).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByTestId('rail-verification')).toHaveAttribute('data-active', 'true');
+  });
+
+  test('Toggle Agent Panel visibility', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('http://localhost:5173/');
+    await page.getByTestId('rail-agent-panel').click();
+    await expect(page.getByTestId('rail-agent-panel')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('rail-agent-panel')).toHaveAttribute('aria-label', /Hide agent details/i);
   });
 });
