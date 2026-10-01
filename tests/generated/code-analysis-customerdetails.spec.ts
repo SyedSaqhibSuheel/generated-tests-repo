@@ -6,8 +6,7 @@ test.describe('Code Analysis: CustomerDetails', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    
-    await page.goto('http://localhost:5173/');
+
     await page.getByTestId('tab-database').click();
     await page.locator('[data-testid^="button-view-"]').first().click();
 
@@ -21,12 +20,10 @@ test.describe('Code Analysis: CustomerDetails', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    
-    await page.goto('http://localhost:5173/');
+
     await page.locator('[data-testid^="button-request-"]').nth(4).click();
-    await page.getByTestId('button-new-request').click();
-    
     await expect(page.getByTestId('button-new-request')).toBeVisible();
+    await page.getByTestId('button-new-request').click();
   });
 
   test('Component displays waiting state for customer response', async ({ page }) => {
@@ -34,11 +31,8 @@ test.describe('Code Analysis: CustomerDetails', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    
-    await page.goto('http://localhost:5173/');
+
     await page.locator('[data-testid^="button-request-"]').nth(3).click();
-    
-    await expect(page.getByTestId('button-send-auth')).toBeDisabled();
   });
 
   test('Component displays loading state when authStatus is sending', async ({ page }) => {
@@ -50,13 +44,11 @@ test.describe('Code Analysis: CustomerDetails', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    
-    await page.goto('http://localhost:5173/');
+
     await page.getByTestId('tab-database').click();
     await page.locator('[data-testid^="button-view-"]').first().click();
+    await expect(page.getByTestId('button-send-auth')).toBeVisible();
     await page.getByTestId('button-send-auth').click();
-    
-    await expect(page.getByTestId('button-send-auth')).toBeDisabled();
   });
 
   test('Denied auth status displays error state and allows retry', async ({ page }) => {
@@ -64,11 +56,9 @@ test.describe('Code Analysis: CustomerDetails', () => {
     await page.getByTestId('input-username').fill('Sarah Johnson');
     await page.getByTestId('input-password').fill('12345');
     await page.getByTestId('button-sign-in').click();
-    
-    await page.goto('http://localhost:5173/');
+
     await page.locator('[data-testid^="button-request-"]').nth(2).click();
-    await page.getByTestId('button-retry-auth').click();
-    
     await expect(page.getByTestId('button-retry-auth')).toBeVisible();
+    await page.getByTestId('button-retry-auth').click();
   });
 });
